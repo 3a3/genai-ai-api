@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "<your-storage-connection-string>",
+    "AZURE_OPENAI_ENDPOINT": "https://<your-aoai>.openai.azure.com",
+    "AZURE_OPENAI_CHAT_DEPLOYMENT": "gpt-5.4-mini",
+    "AZURE_OPENAI_EMBEDDING_DEPLOYMENT": "text-embedding-3-small",
+    "AZURE_OPENAI_API_VERSION": "2024-10-21",
+    "AZURE_SEARCH_ENDPOINT": "https://<your-search>.search.windows.net",
+    "AZURE_SEARCH_INDEX_NAME": "rag-index",
+    "AZURE_STORAGE_ACCOUNT": "<your-storage-name>",
+    "AZURE_STORAGE_SOURCE_CONTAINER": "source-docs"
+  }
+}

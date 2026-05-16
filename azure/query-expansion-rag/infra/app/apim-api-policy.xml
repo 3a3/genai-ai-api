@@ -1,0 +1,28 @@
+<!--
+  APIM ポリシー（API レベル）
+  - リクエスト開始時刻記録
+  - IP allowlist（Bicep 側で apiAllowedSourceIps から ip-filter を生成・置換）
+  - Function App backend へのルーティング（x-functions-key は backend 定義で自動付与）
+  - レスポンス時間ヘッダ
+-->
+<policies>
+  <inbound>
+    <base />
+    <set-variable name="request-start-time" value="@(DateTime.UtcNow)" />
+    <!--IP_FILTER_PLACEHOLDER-->
+    <!-- Function App へルーティング -->
+    <set-backend-service backend-id="{{function-backend-id}}" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+    <set-header name="x-response-time-ms" exists-action="override">
+      <value>@((DateTime.UtcNow - (DateTime)context.Variables["request-start-time"]).TotalMilliseconds.ToString())</value>
+    </set-header>
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

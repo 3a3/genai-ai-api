@@ -1,0 +1,26 @@
+# azd
+.azure/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Azure Functions
+local.settings.json
+bin/
+obj/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+infra/main.json

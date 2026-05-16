@@ -1,0 +1,11 @@
+.git*
+.vscode
+.venv
+__pycache__
+local.settings.json
+test
+tests
+*.pyc
+.pytest_cache
+# ingest はローカル CLI 専用なので Function デプロイから除外
+ingest/

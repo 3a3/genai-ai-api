@@ -1,0 +1,14 @@
+# Azure Functions
+azure-functions>=1.21.0
+
+# Azure Identity / Managed Identity
+azure-identity>=1.19.0
+
+# Azure OpenAI
+openai>=1.55.0
+
+# Azure AI Search
+azure-search-documents>=11.6.0b6
+
+# Azure Blob Storage
+azure-storage-blob>=12.24.0

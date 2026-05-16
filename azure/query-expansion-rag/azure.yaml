@@ -1,0 +1,58 @@
+# azd プロジェクト定義
+# 参考: https://learn.microsoft.com/azure/developer/azure-developer-cli/azd-schema
+name: query-expansion-rag
+metadata:
+  template: query-expansion-rag@1.0.0
+infra:
+  provider: bicep
+  path: infra
+services:
+  api:
+    project: ./app
+    language: python
+    host: function
+
+hooks:
+  postprovision:
+    shell: sh
+    interactive: false
+    continueOnError: false
+    run: |
+      set -eu
+
+      AZURE_SUBSCRIPTION_ID="$(azd env get-value AZURE_SUBSCRIPTION_ID || echo '')"
+      RESOURCE_GROUP="$(azd env get-value AZURE_RESOURCE_GROUP || echo '')"
+      FUNCTION_APP_NAME="$(azd env get-value FUNCTION_APP_NAME || echo '')"
+      APIM_SERVICE_NAME="$(azd env get-value APIM_SERVICE_NAME || echo '')"
+
+      if [ -z "$AZURE_SUBSCRIPTION_ID" ] || [ -z "$RESOURCE_GROUP" ] || [ -z "$FUNCTION_APP_NAME" ] || [ -z "$APIM_SERVICE_NAME" ]; then
+        echo "[postprovision] required azd env values are missing" >&2
+        exit 1
+      fi
+
+      az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+      echo "[postprovision] Fetching Function App default key..."
+      FUNCTION_KEY=""
+      for attempt in 1 2 3 4 5 6; do
+        FUNCTION_KEY="$(az functionapp keys list -n "$FUNCTION_APP_NAME" -g "$RESOURCE_GROUP" --query 'functionKeys.default' -o tsv 2>/dev/null || true)"
+        if [ -n "$FUNCTION_KEY" ]; then
+          break
+        fi
+        echo "[postprovision] waiting for function key (attempt $attempt)..."
+        sleep 20
+      done
+      if [ -z "$FUNCTION_KEY" ]; then
+        echo "[postprovision] failed to retrieve function key" >&2
+        exit 1
+      fi
+
+      echo "[postprovision] Updating APIM Named Value 'function-app-key'..."
+      az apim nv update \
+        --service-name "$APIM_SERVICE_NAME" \
+        -g "$RESOURCE_GROUP" \
+        --name "function-app-key" \
+        --secret true \
+        --value "$FUNCTION_KEY" >/dev/null
+
+      echo "[postprovision] done."
